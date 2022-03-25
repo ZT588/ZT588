@@ -46,7 +46,7 @@ done
 
 wait
 
-sort -g ping.txt |tr -s '\n' > ping1.txt
+sort -g ping.txt |tr -s '\n' >>ping1.txt
 
 l50=$(cat  ping1.txt| awk '{sum+=$1} END {print  NR*0.5}'|cut -d '.' -f1)
 l75=$(cat  ping1.txt| awk '{sum+=$1} END {print  NR*0.75}'|cut -d '.' -f1)
