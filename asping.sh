@@ -39,29 +39,28 @@ do
     c=$(ping -c 100 -W 1 -i 0.1 $b|grep rtt |awk '{print $4}' |awk -F'/' '{print $2}')
 
     echo "$b $c ms"
-    echo "$c" >>/tmp/ping.txt
+    echo "$c" >>ping.txt
 }&
 
 done
 
 wait
 
+sort -g ping.txt |tr -s '\n' > ping1.txt
 
-sort -g /tmp/ping.txt |tr -s '\n' > /tmp/ping1.txt
+l50=$(cat  ping1.txt| awk '{sum+=$1} END {print  NR*0.5}'|cut -d '.' -f1)
+l75=$(cat  ping1.txt| awk '{sum+=$1} END {print  NR*0.75}'|cut -d '.' -f1)
+l90=$(cat  ping1.txt| awk '{sum+=$1} END {print  NR*0.90}'|cut -d '.' -f1)
+l95=$(cat  ping1.txt| awk '{sum+=$1} END {print  NR*0.95}'|cut -d '.' -f1)
 
-l50=$(cat  /tmp/ping1.txt| awk '{sum+=$1} END {print  NR*0.5}'|cut -d '.' -f1)
-l75=$(cat  /tmp/ping1.txt| awk '{sum+=$1} END {print  NR*0.75}'|cut -d '.' -f1)
-l90=$(cat  /tmp/ping1.txt| awk '{sum+=$1} END {print  NR*0.90}'|cut -d '.' -f1)
-l95=$(cat  /tmp/ping1.txt| awk '{sum+=$1} END {print  NR*0.95}'|cut -d '.' -f1)
-
-l=$(cat  /tmp/ping1.txt| awk '{sum+=$1} END {print  NR}')
+l=$(cat  ping1.txt| awk '{sum+=$1} END {print  NR}')
 ll=$(cat  result.txt| awk '{sum+=$1} END {print  NR}')
-k=$(cat /tmp/ping1.txt| awk '{sum+=$1} END {print "平均延迟 =", sum/NR}')
+k=$(cat ping1.txt| awk '{sum+=$1} END {print "平均延迟 =", sum/NR}')
 
-p50=$(cat /tmp/ping1.txt|awk  NR==$l50)
-p75=$(cat /tmp/ping1.txt|awk  NR==$l75)
-p90=$(cat /tmp/ping1.txt|awk  NR==$l90)
-p95=$(cat /tmp/ping1.txt|awk  NR==$l95)
+p50=$(cat ping1.txt|awk  NR==$l50)
+p75=$(cat ping1.txt|awk  NR==$l75)
+p90=$(cat ping1.txt|awk  NR==$l90)
+p95=$(cat ping1.txt|awk  NR==$l95)
 
 echo "==========$h ICMP result=================================="
 
@@ -87,5 +86,5 @@ icmpping
 
 
 
-rm -rf /tmp/ping.txt
-rm -rf /tmp/ping1.tx
+rm -rf ping.txt
+rm -rf ping1.tx
