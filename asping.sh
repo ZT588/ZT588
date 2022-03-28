@@ -10,7 +10,7 @@ bgpq3 -2 $h | awk -F " " '{print $5}'  >>ip_prefixes
 
 
 
-prefixes_list=`shuf -n10 ip_prefixes`
+prefixes_list=`shuf -n50 ip_prefixes`
 
 for m in ${prefixes_list}
 do
@@ -87,4 +87,4 @@ icmpping
 
 
 rm -rf ping.txt
-rm -rf ping1.tx
+rm -rf ping1.txt
