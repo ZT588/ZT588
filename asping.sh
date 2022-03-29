@@ -63,7 +63,7 @@ do
 {
     c=$(ping -c 100 -W 1 -i 0.1 $b|grep rtt |awk '{print $4}' |awk -F'/' '{print $2}')
 
-    echo "$b $c ms"
+    echo "$b $c ms">>$file_name
     echo "$c" >>ping.txt
 }&
 
