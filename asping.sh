@@ -28,8 +28,33 @@ wait
 rm -rf ip_prefixes
 
 
+zenftp(){
+
+#!/bin/sh
+
+ftp -v -n v.zt588.pro<<EOF
+
+user zenlayer iAcdEt2Gzj6tyfrx
+binary
+
+cd IPinfor
+
+put $file_name
+bye
+
+EOF
+
+echo "commit to ftp successfully"
+}
+
+
+
+
+
+
 icmpping(){
 
+file_name=$(date -d "today" +"%Y%m%d_%H%M%S")-$h.txt
 
 IP_LIST=`shuf -n200 result.txt`
 for b in ${IP_LIST}
@@ -88,9 +113,10 @@ curl 'https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=3cd9e34d-9d84-49a7-a1
   "msgtype": "markdown",
   "markdown": {
     "content": "<font color=\"info\">'$h'</font> ICMP延迟测试结果，平均延迟: <font color=\"info\">'$avg'ms</font>\n> P50: <font color=\"warning\">'$p50'ms</font>\n> P75: <font color=\"warning\">'$p75'ms</font>\n> P90: <font color=\"warning\">'$p90'ms</font>\n> P95: <font color=\"warning\">'$p95'ms</font>\n> \n <font color=\"comment\">测试方法：随机抽取50个IP段，总计'$ll'个存活IP，随机抽取200个IP，
-每个IP测试100个ICMP包，求平均值。</font>\n> "
+每个IP测试100个ICMP包，求平均值。</font>\n> [IP 详情](http://v.zt588.pro/IPinfor/'$file_name')     [AS详情](https://bgp.he.net/'$h')     [PeeringDB](https://www.peeringdb.com/search?q='$h')"
   }
 }'
+
 
 
 
@@ -101,8 +127,9 @@ rm -rf result.txt
 
 
 icmpping
-
+zenftp
 
 
 rm -rf ping.txt
 rm -rf ping1.txt
+rm -rf $file_name
