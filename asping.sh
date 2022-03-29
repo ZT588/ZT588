@@ -1,6 +1,10 @@
 #!/bin/bash
 
 yum install bgpq3 -y >/dev/null
+apt install bgpq3 -y >/dev/null
+apt install fping -y >/dev/null
+
+
 
 echo -n "输入需要扫描的AS号（as21859）"
 
