@@ -55,12 +55,14 @@ l95=$(cat  ping1.txt| awk '{sum+=$1} END {print  NR*0.95}'|cut -d '.' -f1)
 
 l=$(cat  ping1.txt| awk '{sum+=$1} END {print  NR}')
 ll=$(cat  result.txt| awk '{sum+=$1} END {print  NR}')
-k=$(cat ping1.txt| awk '{sum+=$1} END {print "平均延迟 =", sum/NR}')
+k=$(cat ping1.txt| awk '{sum+=$1} END {print "平均延迟 =", sum/NR}'|awk -F '=' '{print $2}')
 
 p50=$(cat ping1.txt|awk  NR==$l50)
 p75=$(cat ping1.txt|awk  NR==$l75)
 p90=$(cat ping1.txt|awk  NR==$l90)
 p95=$(cat ping1.txt|awk  NR==$l95)
+
+avg=$(echo $k)
 
 echo "==========$h ICMP result=================================="
 
@@ -76,6 +78,22 @@ echo "测试IP数量：$l  测试IP段：$ll"
 
 
 echo "============================================================="
+
+
+
+curl 'https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=3cd9e34d-9d84-49a7-a144-69a33750b3dd' \
+   -H 'Content-Type: application/json' \
+   -d '
+   {
+  "msgtype": "markdown",
+  "markdown": {
+    "content": "<font color=\"info\">'$h'</font> ICMP延迟测试结果，平均延迟: <font color=\"info\">'$avg'ms</font>\n> P50: <font color=\"warning\">'$p50'ms</font>\n> P75: <font color=\"warning\">'$p75'ms</font>\n> P90: <font color=\"warning\">'$p90'ms</font>\n> P95: <font color=\"warning\">'$p95'ms</font>\n> \n <font color=\"comment\">测试方法：随机抽取50个IP段，总计'$ll'个存活IP，随机抽取200个IP，
+每个IP测试100个ICMP包，求平均值。</font>\n> "
+  }
+}'
+
+
+
 wait
 #rm -rf /tmp/ping.txt
 rm -rf result.txt
