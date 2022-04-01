@@ -1,8 +1,5 @@
 #!/bin/bash
 
-yum install bgpq3 -y >/dev/null
-apt install bgpq3 -y >/dev/null
-apt install fping -y >/dev/null
 
 
 
@@ -10,8 +7,15 @@ echo -n "输入需要扫描的AS号（as21859）"
 
 read h
 
-bgpq3 -2 $h | awk -F " " '{print $5}'  >>ip_prefixes
+filepath=$(pwd)
 
+ipfile="$filepath/alive_$h.txt"
+
+asping(){
+
+#bgpq3 -2 $h | awk -F " " '{print $5}'  >>ip_prefixes
+
+curl  http://v.zt588.pro/ASN/iplist.csv | grep 21859 | awk -F ',' '{print $1}' >> ip_prefixes
 
 
 prefixes_list=`shuf -n50 ip_prefixes`
@@ -21,7 +25,7 @@ do
 {
 
 #echo "$m"
-fping -i 1 -a -g -r 0 $m   >>result.txt
+fping -i 1 -a -g -r 0 $m   >>AS_$h.txt
 
 }&
 
@@ -31,6 +35,9 @@ wait
 
 rm -rf ip_prefixes
 
+shuf -n200 AS_$h.txt|awk -F '[' '{print $1}' >>alive_$h.txt
+
+}
 
 zenftp(){
 
@@ -60,7 +67,14 @@ icmpping(){
 
 file_name=$(date -d "today" +"%Y%m%d_%H%M%S")-$h.txt
 
-IP_LIST=`shuf -n200 result.txt`
+#shuf -n200 AS_$h.txt >>alive_$h.txt
+
+
+#IP_LIST=`shuf -n200 AS_$h.txt`
+
+IP_LIST=`cat alive_$h.txt`
+
+
 for b in ${IP_LIST}
 
 do
@@ -69,13 +83,12 @@ do
 
     echo "$b $c ms">>$file_name
     echo "$c" >>ping.txt
+
 }&
 
 done
 
 wait
-
-sort -g ping.txt |tr -s '\n' >>ping1.txt
 
 l50=$(cat  ping1.txt| awk '{sum+=$1} END {print  NR*0.5}'|cut -d '.' -f1)
 l75=$(cat  ping1.txt| awk '{sum+=$1} END {print  NR*0.75}'|cut -d '.' -f1)
@@ -83,7 +96,7 @@ l90=$(cat  ping1.txt| awk '{sum+=$1} END {print  NR*0.90}'|cut -d '.' -f1)
 l95=$(cat  ping1.txt| awk '{sum+=$1} END {print  NR*0.95}'|cut -d '.' -f1)
 
 l=$(cat  ping1.txt| awk '{sum+=$1} END {print  NR}')
-ll=$(cat  result.txt| awk '{sum+=$1} END {print  NR}')
+ll=$(cat  AS_$h.txt| awk '{sum+=$1} END {print  NR}')
 k=$(cat ping1.txt| awk '{sum+=$1} END {print "平均延迟 =", sum/NR}'|awk -F '=' '{print $2}')
 
 p50=$(cat ping1.txt|awk  NR==$l50)
@@ -126,14 +139,28 @@ curl 'https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=3cd9e34d-9d84-49a7-a1
 
 wait
 #rm -rf /tmp/ping.txt
-rm -rf result.txt
+#rm -rf AS_$h.txt
 }
 
 
-icmpping
-zenftp
+if [ ! -f "$ipfile" ]; then
+
+ echo "文件夹不存在 $ipfile"
+
+ asping
+ icmpping
+ zenftp
+else
+
+ echo "文件夹存在 $ipfile"
+ icmpping
+ zenftp
+fi
+
+#icmpping
+#zenftp
 
 
-rm -rf ping.txt
+
 rm -rf ping1.txt
 rm -rf $file_name
