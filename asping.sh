@@ -2,7 +2,6 @@
 
 
 
-
 echo -n "输入需要扫描的AS号（as21859）"
 
 read h
@@ -15,7 +14,7 @@ asping(){
 
 #bgpq3 -2 $h | awk -F " " '{print $5}'  >>ip_prefixes
 
-curl  http://v.zt588.pro/ASN/iplist.csv | grep 21859 | awk -F ',' '{print $1}' >> ip_prefixes
+curl  http://v.zt588.pro/ASN/iplist.csv | grep $h | awk -F ',' '{print $1}' >> ip_prefixes
 
 
 prefixes_list=`shuf -n50 ip_prefixes`
