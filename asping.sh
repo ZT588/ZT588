@@ -6,9 +6,15 @@ echo -n "输入需要扫描的AS号（as21859）"
 
 read h
 
+
+
 filepath=$(pwd)
 
 ipfile="$filepath/alive_$h.txt"
+
+wget https://g.zt588.pro/alive_ip/alive_$h.txt
+
+wget https://g.zt588.pro/alive_ip/AS_$h.txt
 
 asping(){
 
@@ -59,6 +65,27 @@ echo "commit to ftp successfully"
 
 
 
+ftp_aliveip(){
+
+#!/bin/sh
+
+ftp -v -n v.zt588.pro<<EOF
+
+user zenlayer iAcdEt2Gzj6tyfrx
+binary
+
+cd alive_ip
+
+put alive_$h.txt
+put AS_$h.txt
+bye
+EOF
+
+
+}
+
+
+
 
 
 
@@ -73,21 +100,16 @@ file_name=$(date -d "today" +"%Y%m%d_%H%M%S")-$h.txt
 
 IP_LIST=`cat alive_$h.txt`
 
+#cat $IP_LIST >>alive_$h.txt
 
 for b in ${IP_LIST}
 
 do
-{
-    c=$(ping -c 100 -W 1 -i 0.1 $b|grep rtt |awk '{print $4}' |awk -F'/' '{print $2}')
-
-    echo "$b $c ms">>$file_name
     echo "$c" >>ping.txt
 
-}&
-
-done
-
 wait
+
+sort -g ping.txt |tr -s '\n' >>ping1.txt
 
 l50=$(cat  ping1.txt| awk '{sum+=$1} END {print  NR*0.5}'|cut -d '.' -f1)
 l75=$(cat  ping1.txt| awk '{sum+=$1} END {print  NR*0.75}'|cut -d '.' -f1)
@@ -129,7 +151,7 @@ curl 'https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=3cd9e34d-9d84-49a7-a1
   "msgtype": "markdown",
   "markdown": {
     "content": "<font color=\"info\">'$h'</font> ICMP延迟测试结果，平均延迟: <font color=\"info\">'$avg'ms</font>\n> P50: <font color=\"warning\">'$p50'ms</font>\n> P75: <font color=\"warning\">'$p75'ms</font>\n> P90: <font color=\"warning\">'$p90'ms</font>\n> P95: <font color=\"warning\">'$p95'ms</font>\n> \n <font color=\"comment\">测试方法：随机抽取50个IP段，总计'$ll'个存活IP，随机抽取200个IP，
-每个IP测试100个ICMP包，求平均值。</font>\n> [IP 详情](http://g.zt588.pro/IPinfor/'$file_name')     [AS详情](https://bgp.he.net/'$h')     [PeeringDB](https://www.peeringdb.com/search?q='$h')"
+    每个IP测试100个ICMP包，求平均值。</font>\n> [IP 详情](http://g.zt588.pro/IPinfor/'$file_name')     [存活IP](http://g.zt588.pro/alive_ip/alive_'$h'.txt)     [AS详情](https://bgp.he.net/AS'$h')     [PeeringDB](https://www.peeringdb.com/search?q='$h')"
   }
 }'
 
@@ -149,6 +171,7 @@ if [ ! -f "$ipfile" ]; then
  asping
  icmpping
  zenftp
+ ftp_aliveip
 else
 
  echo "文件夹存在 $ipfile"
@@ -160,6 +183,7 @@ fi
 #zenftp
 
 
-
+rm -rf AS_$h.txt
 rm -rf ping1.txt
 rm -rf $file_name
+rm -rf $ipfile
