@@ -12,9 +12,9 @@ filepath=$(pwd)
 
 ipfile="$filepath/alive_$h.txt"
 
-wget https://g.zt588.pro/alive_ip/alive_$h.txt
+wget https://g.zt588.pro/alive_ip/alive_$h.txt --no-check-certificate
 
-wget https://g.zt588.pro/alive_ip/AS_$h.txt
+wget https://g.zt588.pro/alive_ip/AS_$h.txt --no-check-certificate
 
 asping(){
 
