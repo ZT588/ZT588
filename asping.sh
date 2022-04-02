@@ -107,6 +107,10 @@ for b in ${IP_LIST}
 do
     echo "$c" >>ping.txt
 
+}&
+
+done
+
 wait
 
 sort -g ping.txt |tr -s '\n' >>ping1.txt
