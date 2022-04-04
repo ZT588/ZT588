@@ -195,3 +195,4 @@ rm -rf AS_$h.txt
 rm -rf ping1.txt
 rm -rf $file_name
 rm -rf $ipfile
+rm -rf ping.txt
