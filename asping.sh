@@ -2,11 +2,11 @@
 
 
 
-echo -n "输入需要扫描的AS号（as21859）"
+#echo -n "输入需要扫描的AS号（as21859）"
 
-read h
+#read h
 
-
+h=($1)
 
 filepath=$(pwd)
 
