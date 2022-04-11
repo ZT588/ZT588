@@ -20,7 +20,7 @@ asping(){
 
 #bgpq3 -2 $h | awk -F " " '{print $5}'  >>ip_prefixes
 
-curl  http://v.zt588.pro/ASN/iplist.csv | grep $h | awk -F ',' '{print $1}' >> ip_prefixes
+curl  http://v.zt588.pro/ASN/iplist.csv | grep -w $h | awk -F ',' '{print $1}' >> ip_prefixes
 
 
 prefixes_list=`shuf -n50 ip_prefixes`
