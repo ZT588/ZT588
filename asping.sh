@@ -52,7 +52,7 @@ zenftp(){
 
 ftp -v -n v.zt588.pro<<EOF
 
-user zenlayer iAcdEt2Gzj6tyfrx
+user 
 binary
 
 cd IPinfor
